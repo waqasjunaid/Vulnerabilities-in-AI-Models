@@ -1,82 +1,76 @@
-# When Tool Outputs Become Attacks
+<center>
 
-Indirect prompt injection (IPI) defense for **tool-using LLM agents**: a trust-calibrated guardian with **argument grounding** (v2).
+# AgentDojo: A Dynamic Environment to Evaluate Prompt Injection Attacks and Defenses for LLM Agents
 
-Paper title: *When Tool Outputs Become Attacks: Indirect Prompt Injection Vulnerabilities in LLM Agents*
+![GitHub License](https://img.shields.io/github/license/ethz-spylab/agentdojo) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ethz-spylab/agentdojo/lint-docs.yaml)
+ ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/agentdojo) ![PyPI - Downloads](https://img.shields.io/pypi/dm/agentdojo) ![PyPI - Version](https://img.shields.io/pypi/v/agentdojo)
 
-## What’s in this repo
 
-| Path | Contents |
-|------|----------|
-| `paper/` | Overleaf-ready LaTeX manuscript (`main.tex`, sections, TikZ figures, `refs.bib`) |
-| `src/trust_v2.py` | Argument-grounded guardian v2 (blocks attacker-authored tool arguments; relief for fully goal-aligned calls) |
-| `tools/` | Evaluation / replay / summarization scripts for InjecAgent & AgentDojo runs |
-| `tests/` | Offline unit tests for v2 |
 
-This repo holds the **manuscript** and **evaluation helpers**. The full offline `guardian_lab` environment (AgentDojo checkout, traces, GPU runs) lives on the experiment machine and is not required to edit the paper.
+[Edoardo Debenedetti](https://edoardo.science)<sup>1</sup>, [Jie Zhang](https://zj-jayzhang.github.io)<sup>1</sup>, [Mislav Balunović](https://www.sri.inf.ethz.ch/people/mislav)<sup>1,2</sup>, [Luca Beurer-Kellner](https://www.sri.inf.ethz.ch/people/luca)<sup>1,2</sup>, [Marc Fischer](https://marcfischer.at)<sup>1,2</sup>, [Florian Tramèr](https://floriantramer.com)<sup>1</sup>
 
-## Paper (Overleaf)
+<sup>1</sup>ETH Zurich and <sup>2</sup>Invariant Labs
 
-1. Upload everything under `paper/` to a new Overleaf project (keep the `figures/` folder).
-2. Compile `main.tex`.
-3. Needs packages commonly available on Overleaf: `tikz`, `booktabs`, `algorithm`, `algpseudocode`, `amsmath`, `enumitem`, `hyperref`.
+[Read Paper](https://arxiv.org/abs/2406.13352) | [Inspect Results](https://agentdojo.spylab.ai/results/)
+</center>
 
-## Core idea
-
-IPI is treated as an **authorization** problem, not only text classification:
-
-1. **Provenance** — mark third-party tool observations as untrusted  
-2. **Trust-calibrated gating (v1)** — risk from content, provenance, action prior, and goal compatibility  
-3. **Argument grounding (v2)** — block if call arguments copy entities from injection spans (and not from the user goal); optionally relieve fully aligned, untainted calls  
-4. **Optional learned spans** — sentence detector (`span-v1`) can extend markers; on InjecAgent-style traces it is largely redundant with markers for grounding  
-
-## Headline results (from the manuscript)
-
-- **InjecAgent (DS):** full-chain ASR \(27.6\% \rightarrow 0\%\) with trust-calibrated guardian; ablations reopen \(4.2\%\) / \(9.2\%\) ASR  
-- **Adaptive (stage-only, 8 attempts):** \(0/101\) confirmed bypasses  
-- **AgentDojo (`injecagent`, effect-based, \(n{=}949\)):** ASR \(10.85\% \rightarrow 0.63\%\) (v2 tool-guard) without significant utility loss  
-- **Learned spans:** strong detection in isolation; do not change v2 allow/block vs markers on this set; residuals are answer-only / criterion attacks  
-
-## Tools (experiment machine)
-
-Scripts are plain Python 3.9+ / bash. They expect recorded AgentDojo / guardian runs on the offline box.
-
-| Script | Purpose |
-|--------|---------|
-| `tools/check_leakage.py` | Fail if benchmark-specific answers leak into guardian code |
-| `tools/run_agentdojo_eval.sh` | Frozen AgentDojo eval (`baseline` / `guarded`), resumable |
-| `tools/summarize_agentdojo.py` | Baseline vs guarded rates, Wilson CIs, paired sign test, effect-based rescoring |
-| `tools/case_report.py` | Per-case tools called / blocked / outcomes |
-| `tools/replay_guardian.py` | Replay a guardian version on recorded trajectories (no GPU) |
-| `tools/final_table.py` | Paper-style table over complete runs |
-| `src/trust_v2.py` | Guardian v2 (`GUARDIAN_VERSION=v2`) |
-| `tests/test_trust_v2.py` | Offline v2 unit tests |
-
-### Typical workflow (offline lab)
+## Quickstart
 
 ```bash
-# Leakage check on pipeline + guardian sources
-python tools/check_leakage.py path/to/agent_pipeline.py agentdojo_guardian.py trust_model.py
-
-# Runs (example)
-tools/run_agentdojo_eval.sh baseline runs/agentdojo/final_baseline
-tools/run_agentdojo_eval.sh guarded  runs/agentdojo/final_guarded
-
-# Summary
-python tools/summarize_agentdojo.py \
-  --baseline runs/agentdojo/final_baseline/attack runs/agentdojo/final_baseline/clean \
-  --guarded  runs/agentdojo/final_guarded/attack  runs/agentdojo/final_guarded/clean \
-  --csv final_summary.csv
+pip install agentdojo
 ```
 
-Useful env overrides for the shell runner: `SUITES`, `PHASES`, `MODEL_ID`, `EXTRA`, `GUARDIAN_THRESHOLD`, `GUARDIAN_VERSION`.
+> [!IMPORTANT]
+> Note that the API of the package is still under development and might change in the future.
 
-### Reading AgentDojo numbers
+If you want to use the prompt injection detector, you need to install the `transformers` extra:
 
-- `security == True` means the **attack succeeded** (lower is better).  
-- Prefer **effect-based** scoring (executed calls only); blocked calls should not count as success.  
-- Always report **utility under attack** next to ASR.
+```bash
+pip install "agentdojo[transformers]"
+```
 
-## License / status
+## Running the benchmark
 
-Research prototype and manuscript draft. Not a production security product.
+The benchmark can be run with the [benchmark](src/agentdojo/scripts/benchmark.py) script. Documentation on how to use the script can be obtained with the `--help` flag.
+
+For example, to run the `workspace` suite on the tasks 0 and 1, with `gpt-4o-2024-05-13` as the LLM, the tool filter as a defense, and the attack with tool knowlege, run the following command:
+
+```bash
+python -m agentdojo.scripts.benchmark -s workspace -ut user_task_0 \
+    -ut user_task_1 --model gpt-4o-2024-05-13 \
+    --defense tool_filter --attack tool_knowledge
+```
+
+To run the above, but on all suites and tasks, run the following:
+
+```bash
+python -m agentdojo.scripts.benchmark --model gpt-4o-2024-05-13 \
+    --defense tool_filter --attack tool_knowledge
+```
+
+## Inspect the results
+
+To inspect the results, go to the dedicated [results page](https://agentdojo.spylab.ai/results/) of the documentation. AgentDojo results are also listed in the [Invariant Benchmark Registry](https://explorer.invariantlabs.ai/benchmarks/).Agent
+
+## Documentation of the Dojo
+
+Take a look at our [documentation](https://agentdojo.spylab.ai/).
+
+## Development set-up
+
+Take a look at the [development set-up](https://agentdojo.spylab.ai/development/) docs.
+
+## Citing
+
+If you use AgentDojo in your research, please consider citing our paper:
+
+```bibtex
+@inproceedings{
+ debenedetti2024agentdojo,
+ title={AgentDojo: A Dynamic Environment to Evaluate Prompt Injection Attacks and Defenses for {LLM} Agents},
+ author={Edoardo Debenedetti and Jie Zhang and Mislav Balunovic and Luca Beurer-Kellner and Marc Fischer and Florian Tram{\`e}r},
+ booktitle={The Thirty-eight Conference on Neural Information Processing Systems Datasets and Benchmarks Track},
+ year={2024},
+ url={https://openreview.net/forum?id=m1YYAQjO3w}
+}
+```
