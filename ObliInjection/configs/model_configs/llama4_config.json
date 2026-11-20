@@ -1,0 +1,12 @@
+{
+    "model_info":{
+        "provider":"llama4",
+        "name":"meta-llama/Llama-4-Scout-17B-16E-Instruct"
+    },
+    "params":{
+        "temperature":0.1,
+        "gpus":[0, 1],
+        "device":"cuda",
+        "max_output_tokens":20
+    }
+}

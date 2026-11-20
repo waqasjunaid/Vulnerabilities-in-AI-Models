@@ -1,0 +1,12 @@
+{
+    "model_info":{
+        "provider":"Qwen3-4B",
+        "name":"Qwen/Qwen3-4B-Instruct-2507"
+    },
+    "params":{
+        "temperature":0.1,
+        "gpus":[0],
+        "device":"cuda",
+        "max_output_tokens":20
+    }
+}

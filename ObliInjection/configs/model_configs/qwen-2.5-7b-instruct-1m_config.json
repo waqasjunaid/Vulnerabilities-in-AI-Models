@@ -1,0 +1,12 @@
+{
+    "model_info":{
+        "provider":"Qwen",
+        "name":"Qwen/Qwen2.5-7B-Instruct-1M"
+    },
+    "params":{
+        "temperature":0.1,
+        "gpus":[0],
+        "device":"cuda",
+        "max_output_tokens":20
+    }
+}

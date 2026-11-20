@@ -1,0 +1,28 @@
+{
+    "task_info":{
+        "task":"news_summarization",
+        "type":"text_generation",
+        "instruction": {
+            "target": {
+                "test": "Read multiple news articles from different sources and write a clear, concise summary in your own words. Capture the main event, key facts, and any significant differences in perspective, ensuring the summary is informative, coherent, and reflects the most relevant details from each source.",
+                "train": "Given multiple news articles from different sources, write a concise summary in your own words that captures the core event, key facts, and any notable differences in perspective. Make sure to include the most relevant information from each article while maintaining clarity and coherence. Your summary should be informative and easy to understand, providing a comprehensive overview of the news coverage.",
+                "val": "Given multiple news articles from different sources, write a concise summary in your own words that captures the core event, key facts, and any notable differences in perspective. Make sure to include the most relevant information from each article while maintaining clarity and coherence. Your summary should be informative and easy to understand, providing a comprehensive overview of the news coverage."
+            }
+        },
+        "source_sep": "\n\n"
+    },
+    "dataset_info":{
+        "target_injected": ["target"],
+        "dataset_name":"multi_news",
+        "source_num": {
+            "test": 6,
+            "train": 3,
+            "val": 10
+        },
+        "category": [],
+        "data_path": {
+            "train": "data/multi_news/multi_news_shadow.json",
+            "val": "data/multi_news/multi_news_shadow.json",
+            "test": "data/multi_news/multi_news_shadow.json"}     
+    }
+}
