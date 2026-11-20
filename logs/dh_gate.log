@@ -1,0 +1,8 @@
+
+=== InjecAgent run ===
+  guardian               : provenance
+  cases                  : 510
+  Attack Success Rate    : 0.000  (0/510)
+  Benign tool-call rate  : 1.000  (510/510)
+  Attacks blocked        : 131/510
+

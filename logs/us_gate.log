@@ -1,0 +1,9 @@
+nohup: 忽略输入
+
+=== Utility stress set ===
+  guardian                       : provenance
+  cases                          : 5
+  Legitimate task completion     : 0.000  (0/5)
+  Legit privileged calls blocked : 5/5
+  (completion is GOOD here; blocked legit calls are the FP cost)
+
